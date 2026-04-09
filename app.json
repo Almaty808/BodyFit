@@ -3,15 +3,24 @@
     "name": "BodyFlow",
     "slug": "bodyflow",
     "version": "1.0.0",
+    "scheme": "bodyflow",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.almaty808.bodyflow",
+      "buildNumber": "1.0.0"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
     },
     "android": {
+      "package": "com.almaty808.bodyflow",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#0B1220"
       }
