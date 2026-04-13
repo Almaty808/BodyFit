@@ -1,9 +1,11 @@
+import { useState } from "react";
 import {
   Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -32,12 +34,21 @@ export const NutritionScreen = ({ navigation }: Props) => {
   const foodCatalog = useDataStore((s) => s.foodCatalog);
   const foodLogs = useDataStore((s) => s.foodLogs);
   const addFoodLog = useDataStore((s) => s.addFoodLog);
+  const [query, setQuery] = useState("");
 
   const todayPlan = getTodaysMealPlan(weeklyMealPlan);
   const consumed = getConsumedNutrition(foodLogs, foodCatalog);
   const targetCalories = calculateGoalCalories(profile);
   const macros = calculateMacroTargets(profile);
   const caloriesLeft = Math.max(0, targetCalories - consumed.kcal);
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredFoods = !normalizedQuery
+    ? foodCatalog
+    : foodCatalog.filter((food) =>
+        [food.name, food.serving, food.note].some((value) =>
+          value.toLowerCase().includes(normalizedQuery)
+        )
+      );
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -114,16 +125,30 @@ export const NutritionScreen = ({ navigation }: Props) => {
         </Card>
 
         <Card style={styles.summaryCard}>
-          <Text style={styles.sectionTitle}>Calorie counter</Text>
+          <Text style={styles.sectionTitle}>Food database</Text>
           <Text style={styles.summaryCopy}>
-            Tap Add when you eat something and BodyFlow updates remaining calories automatically.
+            Search any saved item, check calories and macros, then tap Add to update remaining
+            calories instantly.
           </Text>
-          {foodCatalog.map((food) => (
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search food, meal, or serving"
+            placeholderTextColor={colors.textSecondary}
+            style={styles.searchInput}
+          />
+          <Text style={styles.resultMeta}>
+            {filteredFoods.length} item{filteredFoods.length === 1 ? "" : "s"} found
+          </Text>
+          {filteredFoods.map((food) => (
             <View key={food.id} style={styles.foodRow}>
               <View style={styles.foodMain}>
                 <Text style={styles.foodName}>{food.name}</Text>
                 <Text style={styles.foodMeta}>
                   {food.serving} • {food.kcal} kcal
+                </Text>
+                <Text style={styles.foodMeta}>
+                  P {food.macros.protein}g • C {food.macros.carbs}g • F {food.macros.fat}g
                 </Text>
                 <Text style={styles.foodMeta}>{food.note}</Text>
               </View>
@@ -132,6 +157,12 @@ export const NutritionScreen = ({ navigation }: Props) => {
               </Pressable>
             </View>
           ))}
+          {!filteredFoods.length ? (
+            <Text style={styles.emptyState}>
+              No food matched that search yet. Try a simpler word like rice, chicken, burger, or
+              yogurt.
+            </Text>
+          ) : null}
         </Card>
       </ScrollView>
     </SafeAreaView>
@@ -147,6 +178,17 @@ const styles = StyleSheet.create({
   sectionTitle: { color: colors.textPrimary, fontSize: 16, fontWeight: "700" },
   summaryRow: { flexDirection: "row", gap: 8, marginTop: 12, flexWrap: "wrap" },
   summaryCopy: { color: colors.textSecondary, marginTop: 10, lineHeight: 20 },
+  searchInput: {
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.04)",
+    color: colors.textPrimary,
+    paddingHorizontal: 14,
+    paddingVertical: 12
+  },
+  resultMeta: { color: colors.textSecondary, marginTop: 10, fontSize: 12 },
   timeline: { position: "relative", paddingLeft: 4 },
   line: {
     position: "absolute",
@@ -198,5 +240,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10
   },
-  addLabel: { color: colors.accent2, fontWeight: "700" }
+  addLabel: { color: colors.accent2, fontWeight: "700" },
+  emptyState: { color: colors.textSecondary, marginTop: 14, lineHeight: 20 }
 });

@@ -81,7 +81,11 @@ export const WorkoutsScreen = ({ navigation }: Props) => {
                 {workout.exercises.length} exercises • est. {workout.estimatedBurn} kcal
               </Text>
               <Text style={styles.meta}>
-                {workout.exercises.map((exercise) => exercise.name).join(" • ")}
+                {workout.exercises
+                  .slice(0, 4)
+                  .map((exercise) => exercise.name)
+                  .join(" • ")}
+                {workout.exercises.length > 4 ? " • more inside" : ""}
               </Text>
               <Pressable
                 onPress={() => completeWorkout(workout.id)}

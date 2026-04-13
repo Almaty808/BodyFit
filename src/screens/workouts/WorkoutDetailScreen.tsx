@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text } from "react-native";
+import { Linking, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Card } from "../../components/Card";
 import { useDataStore } from "../../store/dataStore";
@@ -12,6 +12,13 @@ export const WorkoutDetailScreen = ({ route }: Props) => {
   const selected = useDataStore((s) =>
     s.workoutsByLocation[preferredLocation].find((w) => w.id === route.params.workoutId)
   );
+  const openLink = (url?: string) => {
+    if (!url) {
+      return;
+    }
+
+    void Linking.openURL(url);
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -29,6 +36,14 @@ export const WorkoutDetailScreen = ({ route }: Props) => {
               {item.sets} sets • {item.reps}
             </Text>
             <Text style={styles.meta}>{item.note}</Text>
+            <View style={styles.linkRow}>
+              <Pressable style={styles.linkButton} onPress={() => openLink(item.googleUrl)}>
+                <Text style={styles.linkLabel}>Google form</Text>
+              </Pressable>
+              <Pressable style={styles.linkButton} onPress={() => openLink(item.youtubeUrl)}>
+                <Text style={styles.linkLabel}>YouTube demo</Text>
+              </Pressable>
+            </View>
           </Card>
         ))}
 
@@ -53,5 +68,15 @@ const styles = StyleSheet.create({
   subtitle: { color: colors.textSecondary, lineHeight: 20, marginBottom: 4, textTransform: "capitalize" },
   card: { padding: 0 },
   name: { color: colors.textPrimary, fontSize: 16, fontWeight: "600" },
-  meta: { color: colors.textSecondary, marginTop: 8, lineHeight: 20 }
+  meta: { color: colors.textSecondary, marginTop: 8, lineHeight: 20 },
+  linkRow: { flexDirection: "row", gap: 10, marginTop: 14, flexWrap: "wrap" },
+  linkButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(56,189,248,0.35)",
+    backgroundColor: "rgba(56,189,248,0.14)"
+  },
+  linkLabel: { color: colors.accent2, fontWeight: "700" }
 });

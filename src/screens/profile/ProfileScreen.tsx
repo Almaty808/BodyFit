@@ -92,11 +92,15 @@ export const ProfileScreen = ({ navigation }: Props) => {
           <Text style={styles.copy}>
             Every workout completion updates weekly consistency and helps explain weight trend changes.
           </Text>
+          <Text style={styles.copy}>
+            Update your profile any time to rebuild calorie targets, BMI, goal timing, and the
+            workout direction around your current body data.
+          </Text>
         </Card>
 
         <Pressable onPress={() => navigation.navigate("Settings")}>
           <Card style={styles.settingsCard}>
-            <Text style={styles.settingsText}>Settings</Text>
+            <Text style={styles.settingsText}>Edit profile & settings</Text>
           </Card>
         </Pressable>
       </ScrollView>
